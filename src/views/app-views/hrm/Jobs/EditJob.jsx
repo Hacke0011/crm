@@ -3,7 +3,7 @@ import { Form, Input, Button, DatePicker, Select, message, Row, Col, Checkbox } 
 import { useNavigate, useParams } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';
-import { Formik, Field, Form as FormikForm } from 'formik';
+import { Formik, Field, Form as FormikForm,ErrorMessage} from 'formik';
 import * as Yup from 'yup';
 
 const { Option } = Select;
@@ -12,7 +12,20 @@ const EditJob = () => {
   const navigate = useNavigate();
   const { jobId } = useParams();
 
-  const [jobData, setJobData] = useState(null);
+  const [jobData, setJobData] = useState({
+    jobTitle: '',
+    branch: 'all',
+    jobCategory: '',
+    positions: '',
+    startDate: null,
+    endDate: null,
+    skills: '',
+    jobDescription: '',
+    jobRequirement: '',
+    status: '',
+    needToAsk: [],
+    needToShow: [],
+  });
 
   useEffect(() => {
     // Simulated API call to fetch job data
@@ -67,181 +80,317 @@ const EditJob = () => {
         initialValues={jobData}
         validationSchema={validationSchema}
         onSubmit={onSubmit}
-        enableReinitialize
       >
-        {({ setFieldValue, values }) => (
-          <FormikForm>
-            <Row gutter={[16, 16]}>
-              {/* Job Title */}
-              <Col span={12}>
-                <Field name="jobTitle">
-                  {({ field }) => (
-                    <Form.Item label="Job Title">
-                      <Input {...field} placeholder="Enter Job Title" />
-                    </Form.Item>
-                  )}
-                </Field>
-              </Col>
-
-              {/* Branch */}
-              <Col span={12}>
-                <Field name="branch">
-                  {({ field }) => (
-                    <Form.Item label="Branch">
-                      <Select {...field} onChange={(value) => setFieldValue('branch', value)}>
-                        <Option value="all">All</Option>
-                        <Option value="branch1">Branch 1</Option>
-                      </Select>
-                    </Form.Item>
-                  )}
-                </Field>
-              </Col>
-
-              {/* Job Category */}
-              <Col span={12}>
-                <Field name="jobCategory">
-                  {({ field }) => (
-                    <Form.Item label="Job Category">
-                      <Select {...field} onChange={(value) => setFieldValue('jobCategory', value)}>
-                        <Option value="it">IT</Option>
-                        <Option value="hr">HR</Option>
-                      </Select>
-                    </Form.Item>
-                  )}
-                </Field>
-              </Col>
-
-              {/* Positions */}
-              <Col span={12}>
-                <Field name="positions">
-                  {({ field }) => (
-                    <Form.Item label="Positions">
-                      <Input {...field} placeholder="Enter number of positions" />
-                    </Form.Item>
-                  )}
-                </Field>
-              </Col>
-
-              {/* Status */}
-              <Col span={12}>
-                <Field name="status">
-                  {({ field }) => (
-                    <Form.Item label="Status">
-                      <Select {...field} onChange={(value) => setFieldValue('status', value)}>
-                        <Option value="active">Active</Option>
-                        <Option value="inactive">Inactive</Option>
-                      </Select>
-                    </Form.Item>
-                  )}
-                </Field>
-              </Col>
-
-              {/* Start Date */}
-              <Col span={12}>
-                <Field name="startDate">
-                  {({ field }) => (
-                    <Form.Item label="Start Date">
-                      <DatePicker
-                        {...field}
-                        style={{ width: '100%' }}
-                        format="YYYY-MM-DD"
-                        value={values.startDate ? new Date(values.startDate) : null}
-                        onChange={(date, dateString) => setFieldValue('startDate', dateString)}
-                      />
-                    </Form.Item>
-                  )}
-                </Field>
-              </Col>
-
-              {/* End Date */}
-              <Col span={12}>
-                <Field name="endDate">
-                  {({ field }) => (
-                    <Form.Item label="End Date">
-                      <DatePicker
-                        {...field}
-                        style={{ width: '100%' }}
-                        format="YYYY-MM-DD"
-                        value={values.endDate ? new Date(values.endDate) : null}
-                        onChange={(date, dateString) => setFieldValue('endDate', dateString)}
-                      />
-                    </Form.Item>
-                  )}
-                </Field>
-              </Col>
-
-              {/* Skills */}
-              <Col span={24}>
-                <Field name="skills">
-                  {({ field }) => (
-                    <Form.Item label="Skills">
-                      <Input {...field} placeholder="Enter required skills" />
-                    </Form.Item>
-                  )}
-                </Field>
-              </Col>
-
-              {/* Job Description */}
-              <Col span={12}>
-                <Field name="jobDescription">
-                  {({ field }) => (
-                    <Form.Item label="Job Description">
-                      <ReactQuill
-                        {...field}
-                        value={values.jobDescription}
-                        onChange={(value) => setFieldValue('jobDescription', value)}
-                        placeholder="Write here..."
-                      />
-                    </Form.Item>
-                  )}
-                </Field>
-              </Col>
-
-              {/* Job Requirement */}
-              <Col span={12}>
-                <Field name="jobRequirement">
-                  {({ field }) => (
-                    <Form.Item label="Job Requirement">
-                      <ReactQuill
-                        {...field}
-                        value={values.jobRequirement}
-                        onChange={(value) => setFieldValue('jobRequirement', value)}
-                        placeholder="Write here..."
-                      />
-                    </Form.Item>
-                  )}
-                </Field>
-              </Col>
-
-              {/* Need to Ask */}
-              <Col span={24}>
-                <Form.Item label="Need to Ask?">
-                  <Checkbox.Group
-                    onChange={(checkedValues) => setFieldValue('needToAsk', checkedValues)}
-                    value={values.needToAsk}
-                  >
-                    <Checkbox value="gender">Gender</Checkbox>
-                    <Checkbox value="dob">Date of Birth</Checkbox>
-                    <Checkbox value="country">Country</Checkbox>
-                  </Checkbox.Group>
-                </Form.Item>
-              </Col>
-
-              {/* Need to Show */}
-              <Col span={24}>
-                <Form.Item label="Need to Show Options?">
-                  <Checkbox.Group
-                    onChange={(checkedValues) => setFieldValue('needToShow', checkedValues)}
-                    value={values.needToShow}
-                  >
-                    <Checkbox value="profileImage">Profile Image</Checkbox>
-                    <Checkbox value="resume">Resume</Checkbox>
-                    <Checkbox value="coverLetter">Cover Letter</Checkbox>
-                    <Checkbox value="terms">Terms and Conditions</Checkbox>
-                  </Checkbox.Group>
-                </Form.Item>
-              </Col>
-            </Row>
+        {({  setFieldValue, values, handleSubmit, handleChange, setFieldTouched }) => (
+          <FormikForm className="formik-form" onSubmit={handleSubmit}>
+             <Row gutter={[16, 16]}>
+                          {/* Job Title */}
+                          <Col span={12}>
+                            <div className="form-item">
+                              <label className='font-semibold'>Job Title</label>
+                              <Field name="jobTitle" as={Input} placeholder="Enter Job Title" rules={[{ required: true }]} />
+                              <ErrorMessage name="jobTitle" component="div" className="error-message text-red-500 my-1" />
+                            </div>
+                          </Col>
+                          {/* <Col span={12}>
+                            <Field name="jobTitle">
+                              {({ field }) => (
+                                <Form.Item label="Job Title">
+                                  <Input {...field} placeholder="Enter Job Title" />
+                                </Form.Item>
+                              )}
+                            </Field>
+                          </Col> */}
+            
+                          {/* Branch */}
+                          <Col span={12}>
+                            <div className="form-item">
+                              <label className='font-semibold'>Branch</label>
+                              <Field name="branch">
+                                {({ field }) => (
+                                  <Select
+                                    {...field}
+                                    className="w-full"
+                                    placeholder="Select Branch"
+                                    onChange={(value) => setFieldValue('branch', value)}
+                                    value={values.branch}
+                                    onBlur={() => setFieldTouched("branch", true)}
+                                  >
+                                    <Option value="all">All</Option>
+                                    <Option value="branch1">Branch 1</Option>
+                                  </Select>
+                                )}
+                              </Field>
+                              <ErrorMessage name="branch" component="div" className="error-message text-red-500 my-1" />
+                            </div>
+                          </Col>
+                          {/* <Col span={12}>
+                            <Field name="branch">
+                              {({ field }) => (
+                                <Form.Item label="Branch">
+                                  <Select {...field} onChange={(value) => setFieldValue('branch', value)}>
+                                    <Option value="all">All</Option>
+                                    <Option value="branch1">Branch 1</Option>
+                                  </Select>
+                                </Form.Item>
+                              )}
+                            </Field>
+                          </Col> */}
+            
+                          {/* Job Category */}
+                          <Col span={12} className='mt-2'>
+                            <div className="form-item">
+                              <label className='font-semibold'>Job Category</label>
+                              <Field name="jobCategory">
+                                {({ field }) => (
+                                  <Select
+                                    {...field}
+                                    className="w-full"
+                                    placeholder="Select job Category"
+                                    onChange={(value) => setFieldValue('jobCategory', value)}
+                                    value={values.jobCategory}
+                                    onBlur={() => setFieldTouched("jobCategory", true)}
+                                  >
+                                    <Option value="it">IT</Option>
+                                    <Option value="hr">HR</Option>
+                                  </Select>
+                                )}
+                              </Field>
+                              <ErrorMessage name="jobCategory" component="div" className="error-message text-red-500 my-1" />
+                            </div>
+                          </Col>
+                          {/* <Col span={12}>
+                            <Field name="jobCategory">
+                              {({ field }) => (
+                                <Form.Item label="Job Category">
+                                  <Select {...field} onChange={(value) => setFieldValue('jobCategory', value)}>
+                                    <Option value="it">IT</Option>
+                                    <Option value="hr">HR</Option>
+                                  </Select>
+                                </Form.Item>
+                              )}
+                            </Field>
+                          </Col> */}
+            
+                          {/* Positions */}
+                          <Col span={12} className='mt-2'>
+                            <div className="form-item">
+                              <label className='font-semibold'>Positions</label>
+                              <Field name="positions" as={Input} placeholder="Enter number of positions" rules={[{ required: true }]} />
+                              <ErrorMessage name="positions" component="div" className="error-message text-red-500 my-1" />
+                            </div>
+                          </Col>
+                          {/* <Col span={12}>
+                            <Field name="positions">
+                              {({ field }) => (
+                                <Form.Item label="Positions">
+                                  <Input {...field} placeholder="Enter number of positions" />
+                                </Form.Item>
+                              )}
+                            </Field>
+                          </Col> */}
+            
+                          {/* Status */}
+                          <Col span={12} className='mt-2'>
+                            <div className="form-item">
+                              <label className='font-semibold'>Status</label>
+                              <Field name="status">
+                                {({ field }) => (
+                                  <Select
+                                    {...field}
+                                    className="w-full"
+                                    placeholder="Select Status"
+                                    onChange={(value) => setFieldValue('status', value)}
+                                    value={values.status}
+                                    onBlur={() => setFieldTouched("status", true)}
+                                  >
+                                    <Option value="active">Active</Option>
+                                    <Option value="inactive">Inactive</Option>
+                                  </Select>
+                                )}
+                              </Field>
+                              <ErrorMessage name="status" component="div" className="error-message text-red-500 my-1" />
+                            </div>
+                          </Col>
+                          {/* <Col span={12}>
+                            <Field name="status">
+                              {({ field }) => (
+                                <Form.Item label="Status">
+                                  <Select {...field} onChange={(value) => setFieldValue('status', value)}>
+                                    <Option value="active">Active</Option>
+                                    <Option value="inactive">Inactive</Option>
+                                  </Select>
+                                </Form.Item>
+                              )}
+                            </Field>
+                          </Col> */}
+            
+                          {/* Start Date */}
+                          <Col span={12} className='mt-2'>
+                            <div className="form-item">
+                              <label className='font-semibold'>Start Date</label>
+                              <DatePicker
+                                className="w-full"
+                                format="DD-MM-YYYY"
+                                value={values.startDate}
+                                onChange={(startDate) => setFieldValue('startDate', startDate)}
+                                onBlur={() => setFieldTouched("startDate", true)}
+                              />
+                              <ErrorMessage name="startDate" component="div" className="error-message text-red-500 my-1" />
+                            </div>
+                          </Col>
+            
+                          {/* End Date */}
+                          <Col span={12} className='mt-2'>
+                            <div className="form-item">
+                              <label className='font-semibold'>End Date</label>
+                              <DatePicker
+                                className="w-full"
+                                format="DD-MM-YYYY"
+                                value={values.endDate}
+                                onChange={(endDate) => setFieldValue('endDate', endDate)}
+                                onBlur={() => setFieldTouched("endDate", true)}
+                              />
+                              <ErrorMessage name="endDate" component="div" className="error-message text-red-500 my-1" />
+                            </div>
+                          </Col>
+            
+                          {/* Skills */}
+                          <Col span={24} className='mt-2'>
+                            <div className="form-item">
+                              <label className='font-semibold'>Skills</label>
+                              <Field name="skills" as={Input} placeholder="Enter Skills" />
+                              <ErrorMessage name="skills" component="div" className="error-message text-red-500 my-1" />
+                            </div>
+                          </Col>
+                          {/* <Col span={24}>
+                            <Field name="skills">
+                              {({ field }) => (
+                                <Form.Item label="Skills">
+                                  <Input {...field} placeholder="Enter required skills" />
+                                </Form.Item>
+                              )}
+                            </Field>
+                          </Col> */}
+            
+                          {/* Job Description */}
+                          <Col span={12} className='mt-2'>
+                            <div className="form-item">
+                              <label className="font-semibold">Job Description</label>
+                              <Field name="jobDescription">
+                                {({ field }) => (
+                                  <ReactQuill
+                                    {...field}
+                                    value={values.jobDescription}
+                                    onChange={(value) => setFieldValue('jobDescription', value)}
+                                    onBlur={() => setFieldTouched("jobDescription", true)}
+                                    placeholder="Write here..."
+                                  />
+                                )}
+                              </Field>
+                              <ErrorMessage name="jobDescription" component="div" className="error-message text-red-500 my-1" />
+                            </div>
+                          </Col>
+                          {/* <Col span={12}>
+                            <Field name="jobDescription">
+                              {({ field }) => (
+                                <Form.Item label="Job Description">
+                                  <ReactQuill
+                                    {...field}
+                                    value={values.jobDescription}
+                                    onChange={(value) => setFieldValue('jobDescription', value)}
+                                    placeholder="Write here..."
+                                  />
+                                </Form.Item>
+                              )}
+                            </Field>
+                          </Col> */}
+            
+                          {/* Job Requirement */}
+                          <Col span={12} className='mt-2'>
+                            <div className="form-item">
+                              <label className="font-semibold">Job Requirement</label>
+                              <Field name="jobRequirement">
+                                {({ field }) => (
+                                  <ReactQuill
+                                    {...field}
+                                    value={values.jobRequirement}
+                                    onChange={(value) => setFieldValue('jobRequirement', value)}
+                                    onBlur={() => setFieldTouched("jobRequirement", true)}
+                                    placeholder="Write here..."
+                                  />
+                                )}
+                              </Field>
+                              <ErrorMessage name="jobRequirement" component="div" className="error-message text-red-500 my-1" />
+                            </div>
+                          </Col>
+                          {/* <Col span={12}>
+                            <Field name="jobRequirement">
+                              {({ field }) => (
+                                <Form.Item label="Job Requirement">
+                                  <ReactQuill
+                                    {...field}
+                                    value={values.jobRequirement}
+                                    onChange={(value) => setFieldValue('jobRequirement', value)}
+                                    placeholder="Write here..."
+                                  />
+                                </Form.Item>
+                              )}
+                            </Field>
+                          </Col> */}
+            
+                          {/* Need to Ask */}
+                          <Col span={24} className='mt-2'>
+                            <label htmlFor="" className='font-semibold me-2'>Need to Ask?</label>
+                            <Checkbox.Group onChange={(checkedValues) => setFieldValue('needToAsk', checkedValues)}
+                                value={values.needToAsk}>
+                              <Row>
+                                <Col><Checkbox value="gender">Gender</Checkbox></Col>
+                                <Col ><Checkbox value="dob">Date of Birth</Checkbox></Col>
+                                <Col ><Checkbox value="country">Country</Checkbox></Col>
+                              </Row>
+                            </Checkbox.Group>
+                          </Col>
+                          {/* <Col span={24}>
+                            <Form.Item label="Need to Ask?">
+                              <Checkbox.Group
+                                onChange={(checkedValues) => setFieldValue('needToAsk', checkedValues)}
+                                value={values.needToAsk}
+                              >
+                                <Checkbox value="gender">Gender</Checkbox>
+                                <Checkbox value="dob">Date of Birth</Checkbox>
+                                <Checkbox value="country">Country</Checkbox>
+                              </Checkbox.Group>
+                            </Form.Item>
+                          </Col> */}
+            
+                          {/* Need to Show Options */}
+                          <Col span={24} className='mt-2'>
+                            <label htmlFor="" className='font-semibold me-2'>Need to Show Options?</label>
+                            <Checkbox.Group onChange={(checkedValues) => setFieldValue('needToAsk', checkedValues)}
+                                value={values.needToAsk}>
+                              <Row>
+                                <Col><Checkbox value="profileImage">Profile Image</Checkbox></Col>
+                                <Col ><Checkbox value="resume">Resume</Checkbox></Col>
+                                <Col ><Checkbox value="coverLetter">Cover Letter</Checkbox></Col>
+                                <Col ><Checkbox value="terms">Terms and Conditions</Checkbox></Col>
+                              </Row>
+                            </Checkbox.Group>
+                          </Col>
+                          {/* <Col span={24}>
+                            <Form.Item label="Need to Show Options?">
+                              <Checkbox.Group
+                                onChange={(checkedValues) => setFieldValue('needToShow', checkedValues)}
+                                value={values.needToShow}
+                              >
+                                <Checkbox value="profileImage">Profile Image</Checkbox>
+                                <Checkbox value="resume">Resume</Checkbox>
+                                <Checkbox value="coverLetter">Cover Letter</Checkbox>
+                                <Checkbox value="terms">Terms and Conditions</Checkbox>
+                              </Checkbox.Group>
+                            </Form.Item>
+                          </Col> */}
+                        </Row>
 
             {/* Form Actions */}
             <Form.Item>

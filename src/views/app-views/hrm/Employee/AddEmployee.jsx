@@ -136,7 +136,7 @@ const AddEmployee = ({onClose,setSub}) => {
         onFinishFailed={onFinishFailed}
       >
         {/* User Information */}
-      <h1 className="text-lg font-bold mb-3">Personal Information</h1>
+      <h1 className="text-lg font-bold mb-1">Personal Information</h1>
                         <Row gutter={16}>
                             <Col span={12}>
                                               <div className="form-item">
@@ -170,7 +170,7 @@ const AddEmployee = ({onClose,setSub}) => {
               <Input placeholder="Doe" />
             </Form.Item>
           </Col> */}
-                            <Col span={12}>
+                            <Col span={12} className="mt-2">
                                               <div className="form-item">
                                                   <label className='font-semibold'>User Name</label>
                                                   <Field name="username" as={Input} placeholder="john_doe" />
@@ -186,7 +186,7 @@ const AddEmployee = ({onClose,setSub}) => {
               <Input placeholder="john_doe" />
             </Form.Item>
           </Col> */}
-                            <Col span={12}>
+                            <Col span={12} className="mt-2">
                                               <div className="form-item">
                                                   <label className='font-semibold'>Password</label>
                                                   <Field name="password" as={Input} placeholder="Strong Password" type='password' />
@@ -202,7 +202,7 @@ const AddEmployee = ({onClose,setSub}) => {
               <Input.Password placeholder="Strong Password" />
             </Form.Item>
           </Col> */}
-                            <Col span={12}>
+                            <Col span={12} className="mt-2">
                                               <div className="form-item">
                                                   <label className='font-semibold'>Email</label>
                                                   <Field name="email" as={Input} placeholder="johndoe@example.com" type='email' />
@@ -221,7 +221,7 @@ const AddEmployee = ({onClose,setSub}) => {
               <Input placeholder="johndoe@example.com" />
             </Form.Item>
           </Col> */}
-                            <Col span={12}>
+                            <Col span={12} className="mt-2">
                                               <div className="form-item">
                                                   <label className='font-semibold'>Phone</label>
                                                   <Field name="phone" as={Input} placeholder="1234567890" />
@@ -320,7 +320,7 @@ const AddEmployee = ({onClose,setSub}) => {
               <DatePicker style={{ width: "100%" }} />
             </Form.Item>
           </Col> */}
-                            <Col span={12}>
+                            <Col span={12} className="mt-2">
                                               <div className="form-item">
                                                   <label className='font-semibold'>Employee ID</label>
                                                   <Field name="employeeId" as={Input} placeholder="OE-012"  />
@@ -375,7 +375,7 @@ const AddEmployee = ({onClose,setSub}) => {
         </Row>
 
         {/* Designation, Salary, and CV Upload */}
-        <Row gutter={16}>
+        <Row gutter={16} className="mt-2">
                   <Col span={12} className='mt-2'>
                               <div className="form-item">
                                 <label className='font-semibold'>Designation</label>
@@ -411,7 +411,7 @@ const AddEmployee = ({onClose,setSub}) => {
               </Select>
             </Form.Item>
           </Col> */}
-                            <Col span={12}>
+                            <Col span={12} className="mt-2">
                                               <div className="form-item">
                                                   <label className='font-semibold'>Salary</label>
                                                   <Field name="salary" as={Input} placeholder="$" type="number"/>
@@ -430,10 +430,10 @@ const AddEmployee = ({onClose,setSub}) => {
 
         </Row>
 
-        <h1 className="text-lg font-bold mb-3">Bank Details</h1>
+        <h1 className="text-lg font-bold mb-3 mt-2">Bank Details</h1>
 
         <Row gutter={16}>
-                            <Col span={12}>
+                            <Col span={12} className="mt-2">
                                               <div className="form-item">
                                                   <label className='font-semibold'>Account Holder Name</label>
                                                   <Field name="accountholder" as={Input} placeholder="John Doe" type="string"/>
@@ -450,7 +450,7 @@ const AddEmployee = ({onClose,setSub}) => {
 
             </Form.Item>
           </Col> */}
-                            <Col span={12}>
+                            <Col span={12} className="mt-2">
                                               <div className="form-item">
                                                   <label className='font-semibold'>Account Number</label>
                                                   <Field name="accountnumber" as={Input} placeholder="123456789" type="number"/>
@@ -467,7 +467,7 @@ const AddEmployee = ({onClose,setSub}) => {
             </Form.Item>
           </Col> */}
 
-                            <Col span={12}>
+                            <Col span={12} className="mt-2">
                                               <div className="form-item">
                                                   <label className='font-semibold'>Bank Name</label>
                                                   <Field name="bankname" as={Input} placeholder="Bank Name" type="string"/>
@@ -485,7 +485,7 @@ const AddEmployee = ({onClose,setSub}) => {
 
             </Form.Item>
           </Col>          */}
-                            <Col span={12}>
+                            <Col span={12} className="mt-2">
                                               <div className="form-item">
                                                   <label className='font-semibold'>IFSC</label>
                                                   <Field name="ifsc" as={Input} placeholder="IFSC" type="number"/>
@@ -503,7 +503,7 @@ const AddEmployee = ({onClose,setSub}) => {
             </Form.Item>
           </Col> */}
 
-                            <Col span={12}>
+                            <Col span={12} className="mt-2">
                                               <div className="form-item">
                                                   <label className='font-semibold'>Bank Location</label>
                                                   <Field name="banklocation" as={Input} placeholder="Bank Location" type="string"/>

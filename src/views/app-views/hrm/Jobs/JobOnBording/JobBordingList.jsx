@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
+import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal,Select } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, EditOutlined, PlusOutlined, FilePdfOutlined, FileExcelOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import UserView from '../../../Users/user-list/UserView';
@@ -15,6 +15,7 @@ import utils from 'utils';
 import EditJobOnBording from './EditJobOnBording';
 import { useNavigate } from 'react-router-dom';
 
+const {Option} = Select;
 const JobOnBordingList = () => {
   const [users, setUsers] = useState(userData);
   const [list, setList] = useState(OrderListData);
@@ -77,6 +78,28 @@ const JobOnBordingList = () => {
     setSelectedUser(null);
     setUserProfileVisible(false);
   };
+
+  const getjobStatus = status => {
+    if (status === 'active') {
+      return 'blue'
+    }
+    if (status === 'blocked') {
+      return 'cyan'
+    }
+    return ''
+  }
+  
+  const handleShowStatus = value => {
+		if (value !== 'All') {
+			const key = 'status'
+			const data = utils.filterArray(userData, key, value)
+			setUsers(data)
+		} else {
+			setUsers(userData)
+		}
+	}
+  
+  const jobStatusList = ['active', 'blocked']
 
   const dropdownMenu = (elm) => (
     <Menu>
@@ -170,11 +193,13 @@ const JobOnBordingList = () => {
         dataIndex: 'createdat',
         sorter: (a, b) => dayjs(a.createdat).unix() - dayjs(b.createdat).unix(),
       },
-      
-    {
+      {
         title: 'Status',
         dataIndex: 'status',
-        sorter: (a, b) => dayjs(a.createdat).unix() - dayjs(b.createdat).unix(),
+        render: (_, record) => (
+          <><Tag color={getjobStatus(record.status)}>{record.status}</Tag></>
+        ),
+        sorter: (a, b) => utils.antdTableSorter(a, b, 'status')
       },
     {
       title: 'Action',
@@ -206,6 +231,18 @@ const JobOnBordingList = () => {
           <div className="mr-md-3 mb-3">
             <Input placeholder="Search" prefix={<SearchOutlined />} onChange={(e) => onSearch(e)} />
           </div>
+          <div className="w-full md:w-48 ">
+                        <Select
+                          defaultValue="All"
+                          className="w-100"
+                          style={{ minWidth: 180 }}
+                          onChange={handleShowStatus}
+                          placeholder="Status"
+                        >
+                          <Option value="All">All Job </Option>
+                          {jobStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
+                        </Select>
+                      </div>
         </Flex>
         <Flex gap="7px">
           <Button type="primary" className="ml-2" onClick={openAddJobOnBordingModal}>

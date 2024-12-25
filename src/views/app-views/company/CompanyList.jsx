@@ -17,6 +17,8 @@ import EditCompany from "./EditCompany";
 import ResetPassword from "./ResetPassword";
 import PlanUpgrade from "./PlanUpgrade";
 
+const { Option } = Select;
+
 const CompanyList = () => {
   const [users, setUsers] = useState(userData);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
@@ -33,17 +35,25 @@ const CompanyList = () => {
     message.success({ content: `Deleted user ${userId}`, duration: 2 });
   };
 
+  const getCompanyStatus = status => {
+    if (status === 'active') {
+      return 'blue'
+    }
+    if (status === 'blocked') {
+      return 'cyan'
+    }
+    return ''
+  }
 
-
-  const paymentStatusList = ['active', 'blocked'];
+  const companyStatusList = ['active', 'blocked'];
 
   const handleShowStatus = (value) => {
     if (value !== 'All') {
       const key = 'status';
-      const data = utils.filterArray(OrderListData, key, value);
-      setList(data);
+      const data = utils.filterArray(userData, key, value);
+      setUsers(data);
     } else {
-      setList(OrderListData);
+      setUsers(userData);
     }
   };
 
@@ -216,12 +226,10 @@ const openAddCompanyModal = () => {
     {
       title: "Status",
       dataIndex: "status",
-      render: (status) => (
-        <Tag className="text-capitalize" color={status === "active" ? "cyan" : "red"}>
-          {status}
-        </Tag>
-      ),
-      sorter: (a, b) => a.status.localeCompare(b.status),
+      render: (_, record) => (
+				<><Tag color={getCompanyStatus(record.status)}>{record.status}</Tag></>
+			),
+			sorter: (a, b) => utils.antdTableSorter(a, b, 'status')
     },
     {
       title: "Action",
@@ -253,8 +261,8 @@ const openAddCompanyModal = () => {
               onChange={handleShowStatus}
               placeholder="Status"
             >
-              <Select.Option value="All">Status</Select.Option>
-              {paymentStatusList.map((elm) => (
+              <Select.Option value="All">All Status</Select.Option>
+              {companyStatusList.map((elm) => (
                 <Select.Option key={elm} value={elm}>
                   {elm}
                 </Select.Option>

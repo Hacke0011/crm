@@ -16,6 +16,7 @@
         "method":"paypal",
         "description":"Hi How are You",
         "user":"plkfkdhks",
+        "priority":"Low",
         "status":"Normal",
         "activity":"2 months ago",
         "subject":"Nothing"
@@ -28,7 +29,7 @@
         "amount": 1328.35,
         "paymentStatus": "Paid",
         "orderStatus": "Ready",
-        "priority":"Expired",
+        "priority":"Medium",
         "status":"Expired"
 
 
@@ -42,7 +43,7 @@
         "paymentStatus": "Paid",
         "status":"Normal",
         "orderStatus": "Shipped",
-        "priority":"Normal"
+        "priority":"High"
 
     },
     {
@@ -63,7 +64,8 @@
         "amount": 817.5,
         "status":"Normal",
         "paymentStatus": "Pending",
-        "orderStatus": "Ready"
+        "orderStatus": "Ready",
+         "priority":"High"
     },
     {
         "id": "#5285",

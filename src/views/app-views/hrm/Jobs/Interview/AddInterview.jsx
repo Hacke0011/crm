@@ -1,12 +1,15 @@
 import React from 'react';
-import { Form, Input, Button, DatePicker, Select, TimePicker, message, Row, Col } from 'antd';
+import {  Input, Button, DatePicker, Select, TimePicker, message, Row, Col } from 'antd';
 import moment from 'moment';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
+
 const { Option } = Select;
 
 const AddInterview = ({ onAddInterview }) => {
-  const [form] = Form.useForm();
+  // const [form] = Form.useForm();
 
-  const onFinish = (values) => {
+  const onSubmit = (values) => {
     const formattedData = {
       id: Date.now(),
       title: values.title,
@@ -19,59 +22,102 @@ const AddInterview = ({ onAddInterview }) => {
     message.success('Interview scheduled successfully!');
   };
 
+  const initialValues = {
+    title: '',
+    interviewer: '',
+    interviewDate: null,
+    interviewTime: null,
+  }
+
+  const validationSchema = Yup.object({
+    title: Yup.string().required('Please enter a interview title.'),
+    interviewer: Yup.string().required('Please select a interviewer.'),
+    interviewDate: Yup.date().nullable().required(' Event Start Date is required.'),
+    interviewTime: Yup.date().nullable().required('Interview Time is required.'),
+  });
+
   return (
-    <Form layout="vertical" form={form} onFinish={onFinish}>
+    <Formik
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      onSubmit={onSubmit}
+    >
+      {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
+        <Form
+          className="formik-form" onSubmit={handleSubmit}
+        >
+          <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
 
-{/* <h2 className="text-lg font-bold mb-3">Job Application Details</h2> */}
-<hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+          <Row gutter={16}>
+            <Col span={12} className='mt-2'>
+              <div className="form-item">
+                <label className='font-semibold'>Interview Title"</label>
+                <Field name="title" as={Input} placeholder="Event Title" />
+                <ErrorMessage name="title" component="div" className="error-message text-red-500 my-1" />
+              </div>
+            </Col>
 
-      <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item
-            name="title"
-            label="Interview Title"
-            rules={[{ required: true, message: 'Please provide a title for the interview.' }]}
-          >
-            <Input placeholder="Interview Title" />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
-          <Form.Item
-            name="interviewer"
-            label="Interviewer"
-            rules={[{ required: true, message: 'Please select an interviewer.' }]}
-          >
-            <Select placeholder="Select Interviewer">
-              <Option value="Candice">Candice</Option>
-              <Option value="John Doe">John Doe</Option>
-            </Select>
-          </Form.Item>
-        </Col>
-        <Col span={12}>
-          <Form.Item
-            name="interviewDate"
-            label="Interview Date"
-            rules={[{ required: true, message: 'Please select an interview date.' }]}
-          >
-            <DatePicker style={{ width: '100%' }} />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
-          <Form.Item
-            name="interviewTime"
-            label="Interview Time"
-            rules={[{ required: true, message: 'Please select an interview time.' }]}
-          >
-            <TimePicker style={{ width: '100%' }} />
-          </Form.Item>
-        </Col>
-      </Row>
-      <Form.Item>
-        <Button type="primary" htmlType="submit">
-          Add Interview
-        </Button>
-      </Form.Item>
-    </Form>
+           
+            <Col span={12} className='mt-2'>
+              <div className="form-item">
+                <label className='font-semibold'>Interviewer</label>
+                <Field name="interviewer">
+                  {({ field }) => (
+                    <Select
+                      {...field}
+                      className="w-full"
+                      placeholder="Select Interviewer"
+                      onChange={(value) => setFieldValue('interviewer', value)}
+                      value={values.interviewer}
+                      onBlur={() => setFieldTouched("interviewer", true)}
+                    >
+                      <Option value="Candice">Candice</Option>
+                      <Option value="John Doe">John Doe</Option>
+                    </Select>
+                  )}
+                </Field>
+                <ErrorMessage name="interviewer" component="div" className="error-message text-red-500 my-1" />
+              </div>
+            </Col>
+
+            <Col span={12} className='mt-2'>
+              <div className="form-item">
+                <label className='font-semibold'>Interview Date</label>
+                <DatePicker
+                  className="w-full"
+                  format="DD-MM-YYYY"
+                  value={values.interviewDate}
+                  onChange={(interviewDate) => setFieldValue('interviewDate', interviewDate)}
+                  onBlur={() => setFieldTouched("interviewDate", true)}
+                />
+                <ErrorMessage name="interviewDate" component="div" className="error-message text-red-500 my-1" />
+              </div>
+            </Col>
+
+
+            <Col span={12} className='mt-2'>
+              <div className="form-item">
+                <label className='font-semibold'>Interview Time</label>
+                <TimePicker
+                  className="w-full"
+                  format="HH:mm"
+                  value={values.interviewTime}
+                  onChange={(interviewTime) => setFieldValue('interviewTime', interviewTime)}
+                  onBlur={() => setFieldTouched("interviewTime", true)}
+                />
+                <ErrorMessage name="interviewTime" component="div" className="error-message text-red-500 my-1" />
+              </div>
+            </Col>
+
+          </Row>
+        
+            <Button type="primary" htmlType="submit" className='mt-3'>
+              Add Interview
+            </Button>
+          
+        </Form>
+      )}
+    </Formik>
   );
 };
 

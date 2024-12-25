@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
+import { Card, Table, Menu, Row, Col, Tag, Input, Select,message, Button, Modal } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, DollarOutlined, FileExcelOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { AiOutlineContainer } from "react-icons/ai";
@@ -10,12 +10,13 @@ import StatisticWidget from 'components/shared-components/StatisticWidget';
 import { AnnualStatisticData } from '../../../dashboards/default/DefaultDashboardData';
 import AvatarStatus from 'components/shared-components/AvatarStatus';
 import AddPaySlip from './AddPaySlip';
-import userData from 'assets/data/user-list.data.json';
-import OrderListData from 'assets/data/order-list.data.json';
+import userData from '../../../../../assets/data/user-list.data.json';
+import OrderListData from '../../../../../assets/data/order-list.data.json';
 import { DatePicker } from 'antd';
 import utils from 'utils';
 import EditPaySlip from './EditPaySlip';
 
+const { Option } = Select
 
 const { MonthPicker } = DatePicker;
 
@@ -154,6 +155,28 @@ const PaySlipList = () => {
     </Menu>
   );
 
+  const getpayslipStatus = status => {
+    if (status === 'active') {
+      return 'success'
+    }
+    if (status === 'blocked') {
+      return 'warning'
+    }
+    return ''
+  }
+
+  const handleShowStatus = value => {
+		if (value !== 'All') {
+			const key = 'status'
+			const data = utils.filterArray(userData, key, value)
+			setUsers(data)
+		} else {
+			setUsers(userData)
+		}
+	}
+
+  const payslipStatusList = ['active','blocked']
+
   const tableColumns = [
     {
       title: 'Employee ID',
@@ -193,9 +216,9 @@ const PaySlipList = () => {
     {
       title: 'Status',
       dataIndex: 'status',
-      render: (status) => (
-        <Tag className="text-capitalize" color={status === 'active' ? 'cyan' : 'red'}>
-          {status}
+      render: (_,record) => (
+        <Tag  color={getpayslipStatus(record.status)}>
+          {record.status}
         </Tag>
       ),
       sorter: {
@@ -233,7 +256,18 @@ const PaySlipList = () => {
           <div className="mr-md-3 mb-3">
             <Input placeholder="Search" prefix={<SearchOutlined />} onChange={(e) => onSearch(e)} />
           </div>
-          
+          <div className="w-full md:w-48">
+							<Select
+								defaultValue="All"
+								className="w-full"
+								style={{ minWidth: 180 }}
+								onChange={handleShowStatus}
+								placeholder="method"
+							>
+								<Option value="All">All method </Option>
+								{payslipStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
+							</Select>
+						</div>
         </Flex>
         <Flex gap="7px">
         <MonthPicker

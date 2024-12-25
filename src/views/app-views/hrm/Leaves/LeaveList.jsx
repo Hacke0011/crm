@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Table, Menu, Tag, Input, message, Button, Modal } from 'antd';
+import { Card, Table, Menu, Tag, Input, message, Button, Modal ,Select} from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import UserView from '../../Users/user-list/UserView';
@@ -12,6 +12,8 @@ import OrderListData from "assets/data/order-list.data.json";
 import utils from 'utils';
 import ViewLeave from './ViewLeave';
 import EditLeave from './EditLeave';
+
+const { Option } = Select
 
 const LeaveList = () => {
   const [users, setUsers] = useState(userData);
@@ -84,6 +86,28 @@ const LeaveList = () => {
     setUserProfileVisible(false);
     setSelectedUser(null);
   };
+
+  const getLeaveStatus = status => {
+    if (status === 'active') {
+      return 'blue'
+    }
+    if (status === 'blocked') {
+      return 'cyan'
+    }
+    return ''
+  }
+  
+  const handleShowStatus = value => {
+		if (value !== 'All') {
+			const key = 'status'
+			const data = utils.filterArray(userData, key, value)
+			setUsers(data)
+		} else {
+			setUsers(userData)
+		}
+	}
+  
+  const leaveStatusList = ['active', 'blocked']
 
   const dropdownMenu = (elm) => (
     <Menu>
@@ -162,12 +186,10 @@ const LeaveList = () => {
     {
       title: 'Status',
       dataIndex: 'status',
-      render: (status) => (
-        <Tag className="text-capitalize" color={status === 'active' ? 'cyan' : 'red'}>
-          {status}
-        </Tag>
-      ),
-      sorter: (a, b) => a.status.length - b.status.length,
+      render: (_, record) => (
+				<><Tag color={getLeaveStatus(record.status)}>{record.status}</Tag></>
+			),
+			sorter: (a, b) => utils.antdTableSorter(a, b, 'status')
     },
     {
       title: 'Action',
@@ -187,6 +209,18 @@ const LeaveList = () => {
           <div className="mr-md-3 mb-3">
             <Input placeholder="Search" prefix={<SearchOutlined />} onChange={onSearch} />
           </div>
+          <div className="w-full md:w-48 ">
+							<Select
+								defaultValue="All"
+								className="w-100"
+								style={{ minWidth: 180 }}
+								onChange={handleShowStatus}
+								placeholder="Status"
+							>
+								<Option value="All">All Order </Option>
+								{leaveStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
+							</Select>
+						</div>
         </Flex>
         <Flex gap="7px">
           <Button type="primary" className="ml-2" onClick={openAddLeaveModal}>
