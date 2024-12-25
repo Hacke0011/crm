@@ -1,20 +1,42 @@
-import React from 'react';
-import {Input, Button, DatePicker, Select, message, Row, Col } from 'antd';
+import React, { useEffect } from 'react';
+import { Form, Input, Button, DatePicker, Select, message, Row, Col } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import ReactQuill from 'react-quill';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
+import { useDispatch, useSelector } from 'react-redux';
+import { CreateL, GetLeave } from "./LeaveReducer/LeaveSlice";
+import { empdata } from '../Employee/EmployeeReducers/EmployeeSlice';
 
 const { Option } = Select;
 const { TextArea } = Input;
 
-const AddLeave = () => {
+const AddLeave = ({ onClose }) => {
+  const [form] = Form.useForm();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const onSubmit = (values) => {
-    console.log('Submitted values:', values);
-    message.success('Leave added successfully!');
-    navigate('/app/hrm/leave');
+  useEffect(() => {
+    dispatch(empdata()); // Fetch employee data 
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(GetLeave()); 
+  }, [dispatch]);
+
+  const allempdata = useSelector((state) => state.employee);
+  const empData = allempdata?.employee?.data; // Extract employee data
+
+  const onFinish = (values) => {
+    dispatch(CreateL(values))
+      .then(() => {
+        dispatch(GetLeave()); // Refresh leave data
+        message.success('Leave added successfully!');
+        form.resetFields(); // Reset form fields
+        onClose(); // Close modal
+        navigate('/app/hrm/leave'); // Redirect to leave page
+      })
+      .catch((error) => {
+        message.error('Failed to add leave.');
+        console.error('Add API error:', error);
+      });
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -43,42 +65,38 @@ const AddLeave = () => {
 
   return (
     <div className="add-leave-form">
-      {/* <h2 className="mb-4"></h2> */}
-       <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={onSubmit}
+      <Form
+        layout="vertical"
+        form={form}
+        name="add-leave"
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
       >
-        {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
-          <Form
-            className="formik-form" onSubmit={handleSubmit}
-            onFinishFailed={onFinishFailed}
-          >
+        <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
 
-            <Row gutter={16}>
-              {/* Employee */}
-              <Col span={24} className='mt-2'>
-                <div className="form-item">
-                  <label className='font-semibold'>Employee</label>
-                  <Field name="employee">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full"
-                        placeholder="Select Employee"
-                        onChange={(value) => setFieldValue('employee', value)}
-                        value={values.employee}
-                        onBlur={() => setFieldTouched("employee", true)}
-                      >
-                        <Option value="employee1">Employee 1</Option>
-                        <Option value="employee2">Employee 2</Option>
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage name="employee" component="div" className="error-message text-red-500 my-1" />
-                </div>
-              </Col>
+        <Row gutter={16}>
+          {/* Employee */}
+          <Col span={24}>
+            <Form.Item
+              name="employee_id"
+              label="Employee"
+              rules={[{ required: true, message: 'Please select an employee.' }]}
+            >
+              <Select placeholder="Select Employee" loading={!empData}>
+                {empData && empData.length > 0 ? (
+                  empData.map((emp) => (
+                    <Option key={emp.id} value={emp.id}>
+                      {emp.firstName || 'Unnamed Employee'}
+                    </Option>
+                  ))
+                ) : (
+                  <Option value="" disabled>
+                    No Employees Available
+                  </Option>
+                )}
+              </Select>
+            </Form.Item>
+          </Col>
 
 
               {/* Leave Type */}
@@ -105,106 +123,35 @@ const AddLeave = () => {
                 </div>
               </Col>
 
-              {/* Start and End Date */}
-              <Col span={12} className='mt-2'>
-                <div className="form-item">
-                  <label className='font-semibold'>Start Date</label>
-                  <DatePicker
-                    className="w-full"
-                    format="DD-MM-YYYY"
-                    value={values.startDate}
-                    onChange={(startDate) => setFieldValue('startDate', startDate)}
-                    onBlur={() => setFieldTouched("startDate", true)}
-                  />
-                  <ErrorMessage name="startDate" component="div" className="error-message text-red-500 my-1" />
-                </div>
-              </Col>
+          {/* Leave Reason */}
+          <Col span={24}>
+            <Form.Item
+              name="reason"
+              label="Leave Reason"
+              rules={[{ required: true, message: 'Please provide a leave reason.' }]}
+            >
+              <TextArea rows={4} placeholder="Leave Reason" />
+            </Form.Item>
+          </Col>
 
 
-              <Col span={12} className='mt-2'>
-                <div className="form-item">
-                  <label className='font-semibold'>End Date</label>
-                  <DatePicker
-                    className="w-full"
-                    format="DD-MM-YYYY"
-                    value={values.endDate}
-                    onChange={(endDate) => setFieldValue('endDate', endDate)}
-                    onBlur={() => setFieldTouched("endDate", true)}
-                  />
-                  <ErrorMessage name="endDate" component="div" className="error-message text-red-500 my-1" />
-                </div>
-              </Col>
-
-              {/* Leave Reason */}
-
-              <Col span={24} className='mt-2'>
-                <div className="form-item">
-                  <label className="font-semibold">Leave Reason</label>
-                  <Field name="leaveReason">
-                    {({ field }) => (
-                      <ReactQuill
-                        {...field}
-                        value={values.leaveReason}
-                        onChange={(value) => setFieldValue('leaveReason', value)}
-                        onBlur={() => setFieldTouched("leaveReason", true)}
-                        placeholder="Leave Reason"
-                      />
-                    )}
-                  </Field>
-                  <ErrorMessage name="leaveReason" component="div" className="error-message text-red-500 my-1" />
-                </div>
-              </Col>
-
-
-              {/* Remark */}
-              <Col span={24} className='mt-2'>
-                <div className="form-item">
-                  <label className="font-semibold">Remark</label>
-                  <Field name="remark">
-                    {({ field }) => (
-                      <ReactQuill
-                        {...field}
-                        value={values.remark}
-                        onChange={(value) => setFieldValue('remark', value)}
-                        onBlur={() => setFieldTouched("remark", true)}
-                        placeholder="Write here..."
-                      />
-                    )}
-                  </Field>
-                  <ErrorMessage name="remark" component="div" className="error-message text-red-500 my-1" />
-                </div>
-              </Col>
-
-            </Row>
-
-            {/* Form Buttons */}
-
-            <div className="form-buttons text-right mt-2">
-              <Button
-                type="default"
-                className="mr-2"
-                onClick={() => navigate('/app/hrm/leave')}
-              >
-                Cancel
-              </Button>
-              <Button type="primary" htmlType="submit">
-                Create
-              </Button>
-            </div>
-
-          </Form>
-        )}
-      </Formik>
+        {/* Form Buttons */}
+        <Form.Item>
+          <div className="form-buttons text-right">
+            <Button type="default" className="mr-2" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="primary" htmlType="submit">
+              Create
+            </Button>
+          </div>
+        </Form.Item>
+      </Form>
     </div>
   );
 };
 
 export default AddLeave;
-
-
-
-
-
 
 
 

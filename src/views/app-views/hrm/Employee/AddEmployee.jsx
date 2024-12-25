@@ -16,27 +16,7 @@ const AddEmployee = ({onClose,setSub}) => {
   const navigate = useNavigate();
   const dispatch = useDispatch()
   
-  const RoleData = async (payload) => {
-    const token = localStorage.getItem("auth_token");
-  
-    try {
-      const res = await axios.post(
-        "http://localhost:5500/api/users/create-employee",
-        payload, 
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-       dispatch(empdata());
-      return res.data;
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error; 
-    }
-  };
-  
+
   // const onSubmit = async (values) => {
   //   console.log("Submitted values:", values);
   //   try {

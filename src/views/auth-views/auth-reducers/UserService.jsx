@@ -9,7 +9,7 @@ import axios from "axios";
 // };
 
 const userLoginapi = async (data) => {
-    const res = await axios.post(`http://localhost:5500/api/users/login`, data);
+    const res = await axios.post(`http://localhost:5353/api/v1/auth/login`, data);
     return res.data
 }
 

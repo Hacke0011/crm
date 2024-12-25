@@ -133,7 +133,7 @@ export const LoginForm = props => {
 				onFinish={onLogin}
 			>
 				<Form.Item 
-					name="email" 
+					name="login" 
 					label="Email" 
 					rules={[
 						{ 

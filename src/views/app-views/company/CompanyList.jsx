@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, Table, Input, Tag, Menu, Button,Select,Modal, message } from "antd";
 import { EyeOutlined, DeleteOutlined, MailOutlined,RocketOutlined, PushpinOutlined,SearchOutlined,EditOutlined,PlusOutlined,FileExcelOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -16,6 +16,8 @@ import AddCompany from "./AddCompany";
 import EditCompany from "./EditCompany";
 import ResetPassword from "./ResetPassword";
 import PlanUpgrade from "./PlanUpgrade";
+import { useDispatch, useSelector } from "react-redux";
+import { ClientData, deleteClient } from "./CompanyReducers/CompanySlice";
 
 const { Option } = Select;
 
@@ -28,10 +30,18 @@ const CompanyList = () => {
   const [isEditCompanyModalVisible, setIsEditCompanyModalVisible] = useState(false);
   const [isResetPasswordModalVisible, setIsResetPasswordModalVisible] = useState(false);
   const [isUpgradePlanModalVisible, setIsUpgradePlanModalVisible] = useState(false);
+  const [comnyid,setCompnyid] = useState("");
+
+  const tabledata = useSelector((state) => state.ClientData);
+  console.log("ooooo",tabledata)
+
+  const dispatch = useDispatch();
 
 
   const deleteUser = (userId) => {
+    dispatch(deleteClient(userId))
     setUsers(users.filter((user) => user.id !== userId));
+    dispatch(ClientData())
     message.success({ content: `Deleted user ${userId}`, duration: 2 });
   };
 
@@ -44,6 +54,21 @@ const CompanyList = () => {
     }
     return ''
   }
+  const comId = (id) =>{
+    setCompnyid(id);
+  }
+
+
+    useEffect(() => {
+      dispatch(ClientData());
+    }, [dispatch]);
+  
+    useEffect(() => {
+       if (tabledata && tabledata.ClientData && tabledata.ClientData.data) {
+         setUsers(tabledata.ClientData.data);
+       }
+     }, [tabledata]);
+
 
   const companyStatusList = ['active', 'blocked'];
 
@@ -63,11 +88,6 @@ const CompanyList = () => {
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
   };
-
-//   const deleteUser = (userId) => {
-//     setUsers(users.filter((user) => user.id !== userId));
-//     message.success({ content: `Deleted user ${userId}`, duration: 2 });
-//   };
 
 const openAddCompanyModal = () => {
     setIsAddCompanyModalVisible(true);
@@ -130,15 +150,19 @@ const openAddCompanyModal = () => {
       </Menu.Item>
       <Menu.Item>
         <Flex alignItems="center">
-      <Button
-        type=""
-        icon={<EditOutlined />}
-        onClick={openEditCompanyModal}
-        size="small"
-        style={{ display: "block", marginBottom: "8px" }}
-      >
-        Edit
-      </Button>
+        <Button
+  type=""
+  icon={<EditOutlined />}
+  onClick={() => {
+    openEditCompanyModal();
+    comId(user.id); // Call the delete user function
+  }}
+  size="small"
+  style={{ display: "block", marginBottom: "8px" }}
+>
+  Edit
+</Button>
+
       </Flex>
       </Menu.Item>
       <Menu.Item>
@@ -307,7 +331,7 @@ const openAddCompanyModal = () => {
         footer={null}
         width={1000}
       >
-        <EditCompany onClose={closeEditCompanyModal} />
+        <EditCompany onClose={closeEditCompanyModal} comnyid={comnyid} />
       </Modal>
 
       <Modal

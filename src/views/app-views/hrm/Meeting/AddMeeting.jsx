@@ -50,29 +50,8 @@ const AddMeeting = () => {
           >
             <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
 
-            <Row gutter={16}>
-              <Col span={24} className='mt-2'>
-                <div className="form-item">
-                  <label className='font-semibold'>Branch</label>
-                  <Field name="branch">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full"
-                        placeholder="Select Branch"
-                        onChange={(value) => setFieldValue('branch', value)}
-                        value={values.branch}
-                        onBlur={() => setFieldTouched("branch", true)}
-                      >
-                        <Option value="branch1">Branch 1</Option>
-                        <Option value="branch2">Branch 2</Option>
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage name="branch" component="div" className="error-message text-red-500 my-1" />
-                </div>
-              </Col>
-              {/* <Col span={24}>
+        <Row gutter={16}>
+          {/* <Col span={24}>
             <Form.Item name="branch" label="Branch*" rules={[{ required: true, message: 'Please enter a branch.' }]}>
             <Select placeholder="Select Branch">
                 <Option value="all">All</Option>

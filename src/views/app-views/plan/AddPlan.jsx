@@ -1,23 +1,62 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Select, Switch, Row, Col } from 'antd';
+import { Form, Input, Button, Select, Switch, Row, Col, message } from 'antd';
+import { useDispatch } from 'react-redux';
+import { CreatePlan, GetPlan } from './PlanReducers/PlanSlice';
+import { useNavigate } from 'react-router-dom';
 
 const { Option } = Select;
 
-const AddPlan = () => {
+const AddPlan = ({ onClose }) => {
   const [form] = Form.useForm();
   const [isTrialEnabled, setIsTrialEnabled] = useState(false);
 
+  const [featureStates, setFeatureStates] = useState({
+    CRM: false,
+    Project: false,
+    HRM: false,
+    Account: false,
+    POS: false,
+    ChatGPT: false,
+  });
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const handleSubmit = (values) => {
-    console.log('Form values:', values);
+    // Include the featureStates as part of the payload
+    const payload = { ...values, features: featureStates };
+
+    dispatch(CreatePlan(payload))
+      .then(() => {
+        dispatch(GetPlan()); // Refresh leave data
+        onClose();
+        setIsTrialEnabled(false);
+        message.success('Plan added successfully!');
+        form.resetFields(); // Reset form fields
+        navigate('/app/superadmin/plan'); // Redirect to leave page
+      })
+      .catch((error) => {
+        message.error('Failed to add plan.');
+        console.error('Add API error:', error);
+      });
   };
 
   const handleTrialToggle = (checked) => {
     setIsTrialEnabled(checked);
   };
 
+  const handleFeatureToggle = (feature, checked) => {
+    setFeatureStates((prev) => ({ ...prev, [feature]: checked }));
+  };
+
+  const cancel = () => {
+    form.resetFields();
+    onClose();
+    setIsTrialEnabled(false);
+  };
+
   return (
     <div>
-      {/* <h2>Create New Plan</h2> */}
       <Form
         form={form}
         layout="vertical"
@@ -29,7 +68,7 @@ const AddPlan = () => {
           }
         }}
       >
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+        <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
 
         <Row gutter={16}>
           <Col span={12}>
@@ -68,7 +107,7 @@ const AddPlan = () => {
 
           <Col span={12}>
             <Form.Item
-              name="maxUsers"
+              name="max_users"
               label="Maximum Users"
               rules={[{ required: true, message: 'Please enter the maximum users!' }]}
             >
@@ -78,7 +117,7 @@ const AddPlan = () => {
 
           <Col span={12}>
             <Form.Item
-              name="maxCustomers"
+              name="max_customers"
               label="Maximum Customers"
               rules={[{ required: true, message: 'Please enter the maximum customers!' }]}
             >
@@ -88,7 +127,7 @@ const AddPlan = () => {
 
           <Col span={12}>
             <Form.Item
-              name="maxVendors"
+              name="max_vendors"
               label="Maximum Vendors"
               rules={[{ required: true, message: 'Please enter the maximum vendors!' }]}
             >
@@ -98,7 +137,7 @@ const AddPlan = () => {
 
           <Col span={12}>
             <Form.Item
-              name="maxClients"
+              name="max_clients"
               label="Maximum Clients"
               rules={[{ required: true, message: 'Please enter the maximum clients!' }]}
             >
@@ -108,7 +147,7 @@ const AddPlan = () => {
 
           <Col span={12}>
             <Form.Item
-              name="storageLimit"
+              name="storage_limit"
               label="Storage Limit (MB)"
               rules={[{ required: true, message: 'Please enter the storage limit!' }]}
             >
@@ -131,28 +170,31 @@ const AddPlan = () => {
 
         {isTrialEnabled && (
           <Form.Item
-            name="trialDays"
+            name="trial_period"
             label="Trial Days"
-            rules={[{ required: true, message: 'Please enter the number of trial days!' }]}
+            rules={[{ required: false }]}
           >
             <Input placeholder="Enter Number of Trial Days" />
           </Form.Item>
         )}
 
-        <Form.Item label="Modules">
-          <Row gutter={16}>
-            <Col span={4}><Switch /> CRM</Col>
-            <Col span={4}><Switch /> Project</Col>
-            <Col span={4}><Switch /> HRM</Col>
-            <Col span={4}><Switch /> Account</Col>
-            <Col span={4}><Switch /> POS</Col>
-            <Col span={4}><Switch /> Chat GPT</Col>
-          </Row>
-        </Form.Item>
+        {/* <Form.Item label="Features"> */}
+          {/* <Row gutter={16}>
+            {Object.keys(featureStates).map((feature) => (
+              <Col span={4} key={feature}>
+                <Switch
+                  checked={featureStates[feature]}
+                  onChange={(checked) => handleFeatureToggle(feature, checked)}
+                />
+                {feature}
+              </Col>
+            ))}
+          </Row> */}
+        {/* </Form.Item> */}
 
         <Form.Item>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button style={{ marginRight: '8px' }} onClick={() => form.resetFields()}>
+            <Button style={{ marginRight: '8px' }} onClick={() => cancel()}>
               Cancel
             </Button>
             <Button type="primary" htmlType="submit">

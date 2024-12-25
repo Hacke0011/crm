@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Table, Menu, Input, Button, Modal, message } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -13,10 +13,13 @@ import EditDepartment from './EditDepartment';
 import userData from "assets/data/user-list.data.json";
 import OrderListData from "assets/data/order-list.data.json";
 import utils from 'utils';
+import { useDispatch, useSelector } from 'react-redux';
+import { DeleteDept, getDept } from './DepartmentReducers/DepartmentSlice';
 
 const DepartmentList = () => {
   const [users, setUsers] = useState(userData);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -24,6 +27,9 @@ const DepartmentList = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddDepartmentModalVisible, setIsAddDepartmentModalVisible] = useState(false);
   const [isEditDepartmentModalVisible, setIsEditDepartmentModalVisible] = useState(false);
+  const  [dept,setDept] = useState("");
+
+  const tabledata = useSelector((state) => state.Department);
 
 
   // const navigate = useNavigate();
@@ -59,9 +65,33 @@ const DepartmentList = () => {
     setSelectedRowKeys([]);
   };
 
+  useEffect(()=>{
+    dispatch(getDept())
+  },[dispatch]);
+
+    useEffect(() => {
+      if (tabledata && tabledata.Department && tabledata.Department.data) {
+        setUsers(tabledata.Department.data);
+      }
+    }, [tabledata]);
+
   const deleteUser = (userId) => {
-    setUsers(users.filter(item => item.id !== userId));
-    message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    // dispatch(DeleteDept());
+    // dispatch(getDept());
+    // setUsers(users.filter(item => item.id !== userId));
+    // message.success({ content: `Deleted user ${userId}`, duration: 2 });
+
+      dispatch(DeleteDept( userId ))
+            .then(() => {
+              dispatch(getDept());
+              message.success('Department Deleted successfully!');
+              setUsers(users.filter(item => item.id !== userId));
+              navigate('/app/hrm/department');
+            })
+            .catch((error) => {
+              message.error('Failed to update department.');
+              console.error('Edit API error:', error);
+            });
   };
 
   const showUserProfile = (userInfo) => {
@@ -74,6 +104,12 @@ const DepartmentList = () => {
     setSelectedUser(null);
   };
 
+  const editDept = (Deptid) =>{
+    openEditDepartmentModal();
+    setDept(Deptid)
+
+  }
+
   const dropdownMenu = (elm) => (
     <Menu>
       <Menu.Item>
@@ -82,7 +118,7 @@ const DepartmentList = () => {
         </Button>
       </Menu.Item>
       <Menu.Item>
-        <Button type="" icon={<EditOutlined />} onClick={openEditDepartmentModal} size="small">
+        <Button type="" icon={<EditOutlined />} onClick={() => editDept(elm.id)} size="small">
           <span>Edit</span>
         </Button>
       </Menu.Item>
@@ -102,7 +138,7 @@ const DepartmentList = () => {
   const tableColumns = [
     {
       title: 'Department',
-      dataIndex: 'department',
+      dataIndex: 'department_name',
       sorter: (a, b) => a.department.length - b.department.length,
     },
     {
@@ -160,7 +196,7 @@ const DepartmentList = () => {
         footer={null}
         width={800}
       >
-        <EditDepartment onClose={closeEditDepartmentModal} />
+        <EditDepartment onClose={closeEditDepartmentModal} comnyid={dept}/>
       </Modal>
 
     </Card>
