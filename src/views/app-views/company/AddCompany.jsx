@@ -1,18 +1,43 @@
 import React, { useState } from "react";
 import { Modal, Form, Input, Switch, Button, Row, Col } from "antd";
+import { useDispatch } from "react-redux";
+import { addClient, ClientData, empdata } from "./CompanyReducers/CompanySlice";
 
-const AddCompany = ({ visible, onCancel, onCreate }) => {
+const AddCompany = ({ visible, onClose, onCreate }) => {
   const [form] = Form.useForm();
-  const [loginEnabled, setLoginEnabled] = useState(true); // State for tracking the Switch
+  const [loginEnabled, setLoginEnabled] = useState(true); 
+  const dispatch = useDispatch()
 
-  const handleFinish = (values) => {
-    console.log("Client Data:", values);
-    onCreate(values); // Pass form values to the parent component
-    form.resetFields();
+
+
+  const handleFinish = async (values) => {
+    try {
+      // Dispatch the addClient action and wait for it to complete
+      await dispatch(addClient(values)).unwrap();
+  
+      console.log("Client Data Added Successfully:", values);
+
+      onClose();
+  
+      // Fetch the latest client data
+      await dispatch(ClientData());
+  
+      // Call the onCreate callback (if any)
+      onCreate(values);
+  
+      // Reset the form fields
+      form.resetFields();
+  
+      // Close the modal or form
+   
+    } catch (error) {
+      console.error("Error Adding Client:", error);
+    }
   };
+ 
 
   const handleSwitchChange = (checked) => {
-    setLoginEnabled(checked); // Update the loginEnabled state based on Switch toggle
+    setLoginEnabled(checked);
   };
 
   return (
@@ -28,7 +53,7 @@ const AddCompany = ({ visible, onCancel, onCreate }) => {
       <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
 
         <Form.Item
-          name="name"
+          name="username"
           label="Name"
           rules={[{ required: true, message: "Please enter the client name" }]}
         >
@@ -68,7 +93,7 @@ const AddCompany = ({ visible, onCancel, onCreate }) => {
         <Form.Item>
           <Row justify="end" gutter={16}>
             <Col>
-              <Button onClick={onCancel}>Cancel</Button>
+              <Button onClick={onClose}>Cancel</Button>
             </Col>
             <Col>
               <Button type="primary" htmlType="submit">

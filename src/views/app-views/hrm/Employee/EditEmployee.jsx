@@ -7,7 +7,7 @@ import TextArea from "antd/es/input/TextArea";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import axios from "axios";
-import { updateEmp } from "./EmployeeReducers/EmployeeSlice";
+import { empdata, updateEmp } from "./EmployeeReducers/EmployeeSlice";
 
 const { Option } = Select;
 
@@ -16,7 +16,7 @@ const EditEmployee = ({ employeeIdd,onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const allempdata = useSelector((state) => state.empdata);
+  const allempdata = useSelector((state) => state.emp);
   const [singleEmp, setSingleEmp] = useState(null);
 
   useEffect(() => {
@@ -35,35 +35,29 @@ const EditEmployee = ({ employeeIdd,onClose }) => {
     }
   }, [singleEmp, form]);
 
-  const EditEmp = async (employeeIdd, values) => {
-    const token = localStorage.getItem("auth_token");
-    try {
-      const res = await axios.put(
-        `http://localhost:5500/api/users/update-employee/${employeeIdd}`,
-        values,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      return res.data;
-    } catch (error) {
-      console.error("Error updating employee data:", error);
-      throw error;
-    }
-  };
 
   const onFinish = async (values) => {
-    try {
-      console.log("Payload:", values);
-      await dispatch(updateEmp({ employeeIdd, values })).unwrap();
-      message.success("Employee details updated successfully!");
-      navigate("/app/hrm/employee");
-      onClose();
-    } catch (error) {
-      message.error(error || "Failed to update employee details. Please try again.");
-    }
+    // try {
+    //   console.log("Payload:", values);
+    //   await dispatch(updateEmp({ employeeIdd, values })).unwrap();
+    //   message.success("Employee details updated successfully!");
+    //   navigate("/app/hrm/employee");
+    //   onClose();
+    // } catch (error) {
+    //   message.error(error || "Failed to update employee details. Please try again.");
+    // }
+
+     dispatch(updateEmp({ employeeIdd, values }))
+          .then(() => {
+            dispatch(empdata());
+            message.success("Employee details updated successfully!");
+            onClose();
+            navigate('/app/hrm/employee');
+          })
+          .catch((error) => {
+            message.error('Failed to update Employee.');
+            console.error('Edit API error:', error);
+          });
   };
 
   const onFinishFailed = (errorInfo) => {

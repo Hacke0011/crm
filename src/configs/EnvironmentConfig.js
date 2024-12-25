@@ -10,6 +10,8 @@ const test = {
   API_ENDPOINT_URL: '/api'
 };
 
+
+
 const getEnv = () => {
 	switch (process.env.NODE_ENV) {
 		case 'development':

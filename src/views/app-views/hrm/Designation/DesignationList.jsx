@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Table, Menu, Button, Input, message, Modal } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, EditOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined } from '@ant-design/icons';
 import UserView from '../../Users/user-list/UserView';
@@ -11,6 +11,8 @@ import OrderListData from "assets/data/order-list.data.json";
 import utils from 'utils';
 import ParticularDesignation from './ParticularDesignation';
 import EditDesignation from './EditDesignation';
+import { useDispatch, useSelector } from 'react-redux';
+import { DeleteDes, getDes } from './DesignationReducers/DesignationSlice';
 
 const DesignationList = () => {
   const [users, setUsers] = useState(userData);
@@ -21,6 +23,22 @@ const DesignationList = () => {
   const [isAddDesignationModalVisible, setIsAddDesignationModalVisible] = useState(false);
   const [isEditDesignationModalVisible, setIsEditDesignationModalVisible] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+    const tabledata = useSelector((state) => state.Designation);
+
+    const [id,setId]=useState("");
+
+    useEffect(()=>{
+      dispatch(getDes())
+    },[dispatch])
+  
+  
+      useEffect(() => {
+        if (tabledata && tabledata.Designation && tabledata.Designation.data) {
+          setUsers(tabledata.Designation.data);
+        }
+      }, [tabledata]);
 
 
   // Open Add Employee Modal
@@ -53,7 +71,6 @@ const DesignationList = () => {
 
 
 
-
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     const searchArray = value ? list : OrderListData;
@@ -63,8 +80,22 @@ const DesignationList = () => {
   };
 
   const deleteUser = (userId) => {
-    setUsers(users.filter(item => item.id !== userId));
-    message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    // setUsers(users.filter(item => item.id !== userId));
+    // dispatch(DeleteDes(userId));
+    // dispatch(getDes())
+    // message.success({ content: `Deleted user ${userId}`, duration: 2 });
+
+      dispatch(DeleteDes( userId ))
+                .then(() => {
+                  dispatch(getDes());
+                  message.success('designation Deleted successfully!');
+                  setUsers(users.filter(item => item.id !== userId));
+                  navigate('/app/hrm/designation');
+                })
+                .catch((error) => {
+                  message.error('Failed to delete designation.');
+                  console.error('Edit API error:', error);
+                });
   };
 
   const showUserProfile = (userInfo) => {
@@ -77,6 +108,11 @@ const DesignationList = () => {
     setSelectedUser(null);
   };
 
+  const editfun = (id) =>{
+    openEditDesignationModal();
+    setId(id)
+  } 
+
   const dropdownMenu = (elm) => (
     <Menu>
       <Menu.Item>
@@ -88,7 +124,7 @@ const DesignationList = () => {
       </Menu.Item>
       <Menu.Item>
         <Flex alignItems="center">
-          <Button type="" icon={<EditOutlined />} onClick={openEditDesignationModal} size="small">
+          <Button type="" icon={<EditOutlined />} onClick={()=>{editfun(elm.id)}} size="small">
             <span className="">Edit</span>
           </Button>
         </Flex>
@@ -113,7 +149,7 @@ const DesignationList = () => {
   const tableColumns = [
     {
       title: 'Designation',
-      dataIndex: 'designation',
+      dataIndex: 'designation_name',
       sorter: {
         compare: (a, b) => a.designation.length - b.designation.length,
       },
@@ -172,7 +208,7 @@ const DesignationList = () => {
         footer={null}
         width={800}
       >
-        <EditDesignation onClose={closeEditDesignationModal} />
+        <EditDesignation onClose={closeEditDesignationModal} id={id}/>
       </Modal>
 
       {/* Particular Designation Modal */}

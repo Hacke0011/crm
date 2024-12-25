@@ -1,29 +1,70 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Select, Switch, Row, Col } from 'antd';
+import { Form, Input, Button, Select, Switch, Row, Col, message } from 'antd';
+import { Editplan, GetPlan } from './PlanReducers/PlanSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import moment from 'moment';
 
 const { Option } = Select;
 
-const EditPlan = ({ planData, onUpdate }) => {
+const EditPlan = ({ planData, onUpdate,id,onClose }) => {
   const [form] = Form.useForm();
   const [isTrialEnabled, setIsTrialEnabled] = useState(planData?.trial || false);
 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   useEffect(() => {
-    // Populate the form with the existing plan data
     form.setFieldsValue(planData);
   }, [planData, form]);
 
   const handleSubmit = (values) => {
-    console.log('Updated Plan:', values);
-    onUpdate(values); // Call the provided callback with updated plan data
+
+    dispatch(Editplan({ id, values }))
+        .then(() => {
+          dispatch(GetPlan());
+          message.success("Plan details updated successfully!");
+          onClose();
+          navigate('/app/superadmin/plan');
+        })
+        .catch((error) => {
+          message.error('Failed to update plan.');
+          console.error('Edit API error:', error);
+        });
+    onUpdate(values); 
   };
+  
+
+  const alldept = useSelector((state) => state.Plan);
+
+    const alldept2 = alldept.Plan.data;
+
+    useEffect(() => {
+      if (id && alldept2) {
+        const data = alldept2.find((item) => item.id === id);
+        if (data) {
+          console.log("iiiiiiiiibbbbbb",data)
+          form.setFieldsValue({
+            ...data,
+            startDate: data.startDate ? moment(data.startDate, 'DD-MM-YYYY') : null,
+            endDate: data.endDate ? moment(data.endDate, 'DD-MM-YYYY') : null,
+          });
+        }
+      }
+    }, [id, alldept2, form]);
+    
+
 
   const handleTrialToggle = (checked) => {
     setIsTrialEnabled(checked);
   };
 
+  const cancel = () =>{
+    onClose()
+  }
+
   return (
     <div>
-      {/* <h2>Edit Plan</h2> */}
       <Form
         form={form}
         layout="vertical"
@@ -34,7 +75,6 @@ const EditPlan = ({ planData, onUpdate }) => {
           }
         }}
       >
-
       <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
 
         <Row gutter={16}>
@@ -74,7 +114,7 @@ const EditPlan = ({ planData, onUpdate }) => {
 
           <Col span={12}>
             <Form.Item
-              name="maxUsers"
+              name="max_users"
               label="Maximum Users"
               rules={[{ required: true, message: 'Please enter the maximum users!' }]}
             >
@@ -84,7 +124,7 @@ const EditPlan = ({ planData, onUpdate }) => {
 
           <Col span={12}>
             <Form.Item
-              name="maxCustomers"
+              name="max_customers"
               label="Maximum Customers"
               rules={[{ required: true, message: 'Please enter the maximum customers!' }]}
             >
@@ -94,7 +134,7 @@ const EditPlan = ({ planData, onUpdate }) => {
 
           <Col span={12}>
             <Form.Item
-              name="maxVendors"
+              name="max_vendors"
               label="Maximum Vendors"
               rules={[{ required: true, message: 'Please enter the maximum vendors!' }]}
             >
@@ -104,7 +144,7 @@ const EditPlan = ({ planData, onUpdate }) => {
 
           <Col span={12}>
             <Form.Item
-              name="maxClients"
+              name="max_clients"
               label="Maximum Clients"
               rules={[{ required: true, message: 'Please enter the maximum clients!' }]}
             >
@@ -114,7 +154,7 @@ const EditPlan = ({ planData, onUpdate }) => {
 
           <Col span={12}>
             <Form.Item
-              name="storageLimit"
+              name="storage_limit"
               label="Storage Limit (MB)"
               rules={[{ required: true, message: 'Please enter the storage limit!' }]}
             >
@@ -145,20 +185,20 @@ const EditPlan = ({ planData, onUpdate }) => {
           </Form.Item>
         )}
 
-        <Form.Item label="Modules">
-          <Row gutter={16}>
+        {/* <Form.Item label="Modules"> */}
+          {/* <Row gutter={16}>
             <Col span={4}><Switch checked={planData?.modules?.CRM} /> CRM</Col>
             <Col span={4}><Switch checked={planData?.modules?.Project} /> Project</Col>
             <Col span={4}><Switch checked={planData?.modules?.HRM} /> HRM</Col>
             <Col span={4}><Switch checked={planData?.modules?.Account} /> Account</Col>
             <Col span={4}><Switch checked={planData?.modules?.POS} /> POS</Col>
             <Col span={4}><Switch checked={planData?.modules?.ChatGPT} /> Chat GPT</Col>
-          </Row>
-        </Form.Item>
+          </Row> */}
+        {/* </Form.Item> */}
 
         <Form.Item>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button style={{ marginRight: '8px' }} onClick={() => form.resetFields()}>
+            <Button style={{ marginRight: '8px' }} onClick={() => cancel()}>
               Cancel
             </Button>
             <Button type="primary" htmlType="submit">

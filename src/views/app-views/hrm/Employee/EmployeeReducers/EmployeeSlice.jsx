@@ -98,9 +98,9 @@ const initialIsAuth = () => {
 };
 
 const RoleAndPermissionSlice = createSlice({
-    name: "empdata",
+    name: "employee",
     initialState: {
-        emp:[],
+        employee:[],
         editItem: {},
         isLoading: false,
         addModel: false,
@@ -154,7 +154,7 @@ const RoleAndPermissionSlice = createSlice({
             })
             .addCase(empdata.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.emp = action?.payload;
+                state.employee = action?.payload;
                 toast.success(action.payload?.data?.message);
             })
             .addCase(empdata.rejected, (state, action) => {

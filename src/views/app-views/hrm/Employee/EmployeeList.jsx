@@ -27,22 +27,23 @@ const EmployeeList = () => {
   const [isAddEmployeeModalVisible, setIsAddEmployeeModalVisible] = useState(false);
   const [isEditEmployeeModalVisible, setIsEditEmployeeModalVisible] = useState(false);
   const [isViewEmployeeModalVisible, setIsViewEmployeeModalVisible] = useState(false);
-  const tabledata = useSelector((state) => state.empdata);
+  const tabledata = useSelector((state) => state.emp);
+  console.log("employeee",tabledata)
   const [sub,setSub] = useState(false);
 
   // Modal handlers
   const openAddEmployeeModal = () => setIsAddEmployeeModalVisible(true);
   const closeAddEmployeeModal = () => setIsAddEmployeeModalVisible(false);
   // const openEditEmployeeModal = () => setIsEditEmployeeModalVisible(true);
-  const closeEditEmployeeModal = () => setIsEditEmployeeModalVisible(false);
   const openViewEmployeeModal = () => setIsViewEmployeeModalVisible(true);
   const closeViewEmployeeModal = () => setIsViewEmployeeModalVisible(false);
-
+  
+  const closeEditEmployeeModal = () => setIsEditEmployeeModalVisible(false);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
 
 const openEditEmployeeModal = (empId) => {
-  setSelectedEmployeeId(empId); // Store the employee ID
-  setIsEditEmployeeModalVisible(true); // Open the modal
+  setSelectedEmployeeId(empId); 
+  setIsEditEmployeeModalVisible(true);
 };
 
   // Search handler

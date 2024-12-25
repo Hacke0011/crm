@@ -1,75 +1,95 @@
-import React from "react";
-import { Button, Typography, Row, Col, Divider, Modal } from "antd";
+import React, { useEffect } from "react";
+import { Button, Typography, Row, Col, Divider, message } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { GetLeave, EditLeaveAction, EditLeave } from "./LeaveReducer/LeaveSlice";
+import { useNavigate } from "react-router-dom";
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
-const ViewLeave = ({ visible, onClose, onApprove, onReject, leaveData }) => {
-  // Sample leave data (can be replaced by props or API response)
-  const defaultLeaveData = {
-    employee: "Sonya Sims",
-    leaveType: "Casual Leave",
-    appliedOn: "21-04-2023",
-    startDate: "05-05-2023",
-    endDate: "07-05-2023",
-    leaveReason: "Emergency medical procedure",
-    status: "Approved",
+const ViewLeave = ({ visible, onClose, editid }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    dispatch(GetLeave()); 
+  }, [dispatch]);
+
+  const leaveData = useSelector((state) => state.Leave);
+  const leaveList = leaveData?.Leave?.data;
+
+  const leave = leaveList?.find((item) => item.id === editid);
+
+  if (!leave) {
+    return <Text>No leave data found for the selected ID.</Text>;
+  }
+
+  const handleAction = (status) => {
+    const payload = { id: editid, values: { status } };
+    dispatch(EditLeave(payload))
+      .then(() => {
+        dispatch(GetLeave());
+        message.success(`Leave ${status} successfully!`);
+        onClose();
+        navigate("/app/hrm/leave");
+      })
+      .catch((error) => {
+        message.error(`Failed to ${status} leave.`);
+        console.error("Edit API error:", error);
+      });
   };
 
-  const data = leaveData || defaultLeaveData;
-
   return (
-   <>
-      <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+    <>
+      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
 
       <Row gutter={[16, 16]}>
-        
         <Col span={8}>
           <Text strong>Employee</Text>
         </Col>
         <Col span={16}>
-          <Text>{data.employee}</Text>
+          <Text>{leave.employee}</Text>
         </Col>
 
         <Col span={8}>
           <Text strong>Leave Type</Text>
         </Col>
         <Col span={16}>
-          <Text>{data.leaveType}</Text>
+          <Text>{leave.leaveType}</Text>
         </Col>
 
         <Col span={8}>
           <Text strong>Applied On</Text>
         </Col>
         <Col span={16}>
-          <Text>{data.appliedOn}</Text>
+          <Text>{leave.startDate}</Text>
         </Col>
 
         <Col span={8}>
           <Text strong>Start Date</Text>
         </Col>
         <Col span={16}>
-          <Text>{data.startDate}</Text>
+          <Text>{leave.startDate}</Text>
         </Col>
 
         <Col span={8}>
           <Text strong>End Date</Text>
         </Col>
         <Col span={16}>
-          <Text>{data.endDate}</Text>
+          <Text>{leave.endDate}</Text>
         </Col>
 
         <Col span={8}>
           <Text strong>Leave Reason</Text>
         </Col>
         <Col span={16}>
-          <Text>{data.leaveReason}</Text>
+          <Text>{leave.reason}</Text>
         </Col>
 
         <Col span={8}>
           <Text strong>Status</Text>
         </Col>
         <Col span={16}>
-          <Text>{data.status}</Text>
+          <Text>{leave.status}</Text>
         </Col>
       </Row>
 
@@ -77,25 +97,17 @@ const ViewLeave = ({ visible, onClose, onApprove, onReject, leaveData }) => {
 
       <Row justify="end" gutter={16}>
         <Col>
-          <Button
-            type="primary"
-            onClick={onApprove}
-          >
+          <Button type="primary" onClick={() => handleAction("approved")}>
             Approve
           </Button>
         </Col>
         <Col>
-          <Button
-            type="primary"
-            danger
-            onClick={onReject}
-          >
+          <Button type="primary" danger onClick={() => handleAction("rejected")}>
             Reject
           </Button>
         </Col>
       </Row>
-      </>
-    // {/* </Modal> */}
+    </>
   );
 };
 

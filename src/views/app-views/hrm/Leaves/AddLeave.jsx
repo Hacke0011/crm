@@ -1,18 +1,42 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, Input, Button, DatePicker, Select, message, Row, Col } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { CreateL, GetLeave } from "./LeaveReducer/LeaveSlice";
+import { empdata } from '../Employee/EmployeeReducers/EmployeeSlice';
 
 const { Option } = Select;
 const { TextArea } = Input;
 
-const AddLeave = () => {
+const AddLeave = ({ onClose }) => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(empdata()); // Fetch employee data 
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(GetLeave()); 
+  }, [dispatch]);
+
+  const allempdata = useSelector((state) => state.employee);
+  const empData = allempdata?.employee?.data; // Extract employee data
 
   const onFinish = (values) => {
-    console.log('Submitted values:', values);
-    message.success('Leave added successfully!');
-    navigate('/app/hrm/leave');
+    dispatch(CreateL(values))
+      .then(() => {
+        dispatch(GetLeave()); // Refresh leave data
+        message.success('Leave added successfully!');
+        form.resetFields(); // Reset form fields
+        onClose(); // Close modal
+        navigate('/app/hrm/leave'); // Redirect to leave page
+      })
+      .catch((error) => {
+        message.error('Failed to add leave.');
+        console.error('Add API error:', error);
+      });
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -22,7 +46,6 @@ const AddLeave = () => {
 
   return (
     <div className="add-leave-form">
-      {/* <h2 className="mb-4"></h2> */}
       <Form
         layout="vertical"
         form={form}
@@ -30,20 +53,28 @@ const AddLeave = () => {
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
-      <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+        <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
 
         <Row gutter={16}>
           {/* Employee */}
           <Col span={24}>
             <Form.Item
-              name="employee"
+              name="employee_id"
               label="Employee"
               rules={[{ required: true, message: 'Please select an employee.' }]}
             >
-              <Select placeholder="Select Employee">
-                <Option value="employee1">Employee 1</Option>
-                <Option value="employee2">Employee 2</Option>
-                <Option value="employee3">Employee 3</Option>
+              <Select placeholder="Select Employee" loading={!empData}>
+                {empData && empData.length > 0 ? (
+                  empData.map((emp) => (
+                    <Option key={emp.id} value={emp.id}>
+                      {emp.firstName || 'Unnamed Employee'}
+                    </Option>
+                  ))
+                ) : (
+                  <Option value="" disabled>
+                    No Employees Available
+                  </Option>
+                )}
               </Select>
             </Form.Item>
           </Col>
@@ -86,7 +117,7 @@ const AddLeave = () => {
           {/* Leave Reason */}
           <Col span={24}>
             <Form.Item
-              name="leaveReason"
+              name="reason"
               label="Leave Reason"
               rules={[{ required: true, message: 'Please provide a leave reason.' }]}
             >
@@ -109,11 +140,7 @@ const AddLeave = () => {
         {/* Form Buttons */}
         <Form.Item>
           <div className="form-buttons text-right">
-            <Button
-              type="default"
-              className="mr-2"
-              onClick={() => navigate('/app/hrm/leave')}
-            >
+            <Button type="default" className="mr-2" onClick={onClose}>
               Cancel
             </Button>
             <Button type="primary" htmlType="submit">
@@ -127,12 +154,6 @@ const AddLeave = () => {
 };
 
 export default AddLeave;
-
-
-
-
-
-
 
 
 

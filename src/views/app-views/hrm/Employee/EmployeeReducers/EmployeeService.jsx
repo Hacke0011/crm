@@ -12,7 +12,7 @@ import axios from "axios";
         const token = localStorage.getItem("auth_token");
         try {
           const res = await axios.get(
-            "http://localhost:5500/api/users/get-all-employees",
+            "http://localhost:5353/api/v1/employees/",
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -32,7 +32,7 @@ import axios from "axios";
       
         try {
           const res = await axios.post(
-            "http://localhost:5500/api/users/create-employee",
+            "http://localhost:5353/api/v1/employees/",
             payload, 
             {
               headers: {
@@ -53,7 +53,7 @@ import axios from "axios";
       
         try {
           const res = await axios.delete(
-            `http://localhost:5500/api/users/delete-employee/${id}`, 
+            `http://localhost:5353/api/v1/employees/${id}`, 
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -73,7 +73,7 @@ import axios from "axios";
         const token = localStorage.getItem("auth_token");
         try {
           const res = await axios.put(
-            `http://localhost:5500/api/users/update-employee/${employeeIdd}`,
+            `http://localhost:5353/api/v1/employees/${employeeIdd}`,
             values,
             {
               headers: {

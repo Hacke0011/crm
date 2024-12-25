@@ -26,8 +26,8 @@ export const userLogin = createAsyncThunk(
             const response = await UserService.userLoginapi(loginData);
             if (response) {
                 localStorage.setItem("isAuth", JSON.stringify(true));
-                localStorage.setItem("USER", JSON.stringify(response.user));
-                localStorage.setItem("auth_token", JSON.stringify(response.token));
+                localStorage.setItem("USER", JSON.stringify(response.data.user));
+                localStorage.setItem("auth_token", JSON.stringify(response.data.token));
             }
             return response;
         } catch (error) {

@@ -28,14 +28,14 @@ const AddMeeting = () => {
               <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
 
         <Row gutter={16}>
-          <Col span={24}>
+          {/* <Col span={24}>
             <Form.Item name="branch" label="Branch*" rules={[{ required: true, message: 'Please enter a branch.' }]}>
             <Select placeholder="Select Branch">
                 <Option value="all">All</Option>
                 <Option value="branch1">Branch 1</Option>
               </Select>
             </Form.Item>
-          </Col>
+          </Col> */}
 
           <Col span={24}>
             <Form.Item name="department" label="Department" rules={[{ required: true, message: 'Please select a Department.' }]}>
