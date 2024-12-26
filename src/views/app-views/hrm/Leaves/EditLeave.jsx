@@ -5,11 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { empdata } from '../Employee/EmployeeReducers/EmployeeSlice';
 import { EditLeave as EditLeaveAction, GetLeave } from './LeaveReducer/LeaveSlice'; // Fixed import
-import { Formik } from 'formik';
-
 const { Option } = Select;
 const { TextArea } = Input;
-
 const EditLeave = ({ editid, onClose }) => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
@@ -20,17 +17,14 @@ const EditLeave = ({ editid, onClose }) => {
   
 console.log("bbbb",leaveData)
 console.log("vvvv",empData)
-
 const employeedata = empData.employee.data;
-
   const [isDataLoaded, setIsDataLoaded] = useState(false);
-
+  
   useEffect(() => {
     dispatch(GetLeave());
   }, [dispatch]);
 
   useEffect(() => {
-
     console.log("iiiiii",editid)
     if (editid && leaveData?.Leave?.data.length > 0 && employeedata.length > 0) {
       const leave = leaveData.Leave.data.find((item) => item.id === editid);
@@ -48,6 +42,7 @@ const employeedata = empData.employee.data;
       }
     }
   }, [editid, leaveData, employeedata, form]);
+
 
   const onFinish = async (values) => {
     try {
@@ -73,25 +68,22 @@ const employeedata = empData.employee.data;
       message.error('Failed to update leave: ' + error.message);
     }
   };
-
   const onFinishFailed = (errorInfo) => {
     message.error('Please check all required fields');
   };
-
   const onCloseHandler = () => {
     form.resetFields(); // Reset form fields on close
     onClose(); // Close the modal
   };
-
  
   return (
     <div className="edit-leave-form">
-      {/* <h2 className="mb-4"></h2> */}
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={onSubmit}
+      <Form
+        layout="vertical"
+        form={form}
+        name="edit-leave"
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
       >
         <Row gutter={16}>
           <Col span={24}>
@@ -109,7 +101,6 @@ const employeedata = empData.employee.data;
               </Select>
             </Form.Item>
           </Col>
-
           <Col span={24}>
             <Form.Item
               name="leaveType"
@@ -123,7 +114,6 @@ const employeedata = empData.employee.data;
               </Select>
             </Form.Item>
           </Col>
-
           <Col span={12}>
             <Form.Item
               name="startDate"
@@ -136,7 +126,6 @@ const employeedata = empData.employee.data;
               />
             </Form.Item>
           </Col>
-
           <Col span={12}>
             <Form.Item
               name="endDate"
@@ -149,7 +138,6 @@ const employeedata = empData.employee.data;
               />
             </Form.Item>
           </Col>
-
           <Col span={24}>
             <Form.Item
               name="reason"
@@ -159,7 +147,6 @@ const employeedata = empData.employee.data;
               <TextArea rows={4} />
             </Form.Item>
           </Col>
-
           <Col span={24}>
             <Form.Item
               name="remark"
@@ -170,7 +157,6 @@ const employeedata = empData.employee.data;
             </Form.Item>
           </Col>
         </Row>
-
         <Form.Item>
           <div className="form-buttons" style={{ textAlign: 'right' }}>
             <Button 
@@ -185,10 +171,8 @@ const employeedata = empData.employee.data;
             </Button>
           </div>
         </Form.Item>
-      </Formik>
+      </Form>
     </div>
   );
 };
-
 export default EditLeave;
-

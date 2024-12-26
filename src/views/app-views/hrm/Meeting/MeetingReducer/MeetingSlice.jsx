@@ -4,11 +4,11 @@ import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 
 // Async thunk for adding user
-export const addEmp = createAsyncThunk(
+export const AddMeet = createAsyncThunk(
     "users/addUser",
     async (userData, thunkAPI) => {
         try {
-            const response = await UserService.createEmp(userData);
+            const response = await UserService.CreateMeet(userData);
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -19,11 +19,11 @@ export const addEmp = createAsyncThunk(
 // Async thunk for user login
 
 
-export const empdata = createAsyncThunk(
-    "emp/getEmp",
+export const MeetData = createAsyncThunk(
+    "emp/getmeet",
     async (loginData, thunkAPI) => {
         try {
-            const response = await UserService.CreateMeet(loginData);
+            const response = await UserService.getMeet(loginData);
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -58,22 +58,22 @@ export const getUserById = createAsyncThunk(
 );
 
 // Async thunk for deleting a user
-export const deleteEmp = createAsyncThunk(
-    "users/deleteUser",
+export const deleteM = createAsyncThunk(
+    "users/deleteMeet",
     async (userId, thunkAPI) => {
         try {
-            const response = await UserService.Empdelete(userId);
+            const response = await UserService.DeleteMeet(userId);
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
         }
     }
 );
-export const updateEmp = createAsyncThunk(
-    "users/updateEmployee",
-    async ({ employeeIdd, values }, thunkAPI) => {
+export const EditMeet = createAsyncThunk(
+    "users/EditMeet",
+    async ({ meetid, values }, thunkAPI) => {
       try {
-        const response = await UserService.EditEmp(employeeIdd, values);
+        const response = await UserService.EditMeet(meetid, values);
         return response; // Return the updated data
       } catch (error) {
         return thunkAPI.rejectWithValue(error.response?.data || "Error updating employee");
@@ -98,9 +98,9 @@ const initialIsAuth = () => {
 };
 
 const RoleAndPermissionSlice = createSlice({
-    name: "empdata",
+    name: "Meeting",
     initialState: {
-        emp:[],
+        Meeting:[],
         editItem: {},
         isLoading: false,
         addModel: false,
@@ -137,27 +137,27 @@ const RoleAndPermissionSlice = createSlice({
     extraReducers: (builder) => {
         builder
             //add
-            .addCase(addEmp.pending, (state) => {
+            .addCase(AddMeet.pending, (state) => {
                 state.isLoading = true;
             })
-            .addCase(addEmp.fulfilled, (state, action) => {
+            .addCase(AddMeet.fulfilled, (state, action) => {
                 state.isLoading = false;
                 toast.success(action.payload?.data?.message);
             })
-            .addCase(addEmp.rejected, (state, action) => {
+            .addCase(AddMeet.rejected, (state, action) => {
                 state.isLoading = false;
                 toast.error(action.payload?.message);
             })
 
-            .addCase(empdata.pending, (state) => {
+            .addCase(MeetData.pending, (state) => {
                 state.isLoading = true;
             })
-            .addCase(empdata.fulfilled, (state, action) => {
+            .addCase(MeetData.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.emp = action?.payload;
+                state.Meeting = action?.payload;
                 toast.success(action.payload?.data?.message);
             })
-            .addCase(empdata.rejected, (state, action) => {
+            .addCase(MeetData.rejected, (state, action) => {
                 state.isLoading = false;
                 toast.error(action.payload?.message);
             })
@@ -190,27 +190,27 @@ const RoleAndPermissionSlice = createSlice({
                 toast.error(action.payload?.response?.data?.message);
             })
             //delete
-            .addCase(deleteEmp.pending, (state) => {
+            .addCase(deleteM.pending, (state) => {
                 state.isLoading = true;
             })
-            .addCase(deleteEmp.fulfilled, (state, action) => {
+            .addCase(deleteM.fulfilled, (state, action) => {
                 state.isLoading = false;
                 toast.success(action.payload.message);
             })
-            .addCase(deleteEmp.rejected, (state, action) => {
+            .addCase(deleteM.rejected, (state, action) => {
                 state.isLoading = false;
                 toast.error(action.payload?.response?.data?.message);
             })
             //update
-            .addCase(updateEmp.pending, (state) => {
+            .addCase(EditMeet.pending, (state) => {
                 state.isLoading = false;
                 state.error = null;
               })
-              .addCase(updateEmp.fulfilled, (state, action) => {
+              .addCase(EditMeet.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.editItem = action.payload; // Update the state with the updated employee data
               })
-              .addCase(updateEmp.rejected, (state, action) => {
+              .addCase(EditMeet.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload || "Failed to update employee";
               });
